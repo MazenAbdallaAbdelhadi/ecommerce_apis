@@ -39,7 +39,11 @@ exports.loginValidator = asyncHandler(async (req, res, next) => {
 
   const user = await User.findOne({ email: req.body.email });
 
-  if (!user || !(await user.comparePassword(req.body.password))) {
+  // console.log(req.body.password);
+  const result = await user.comparePassword(req.body.password);
+  console.log(result);
+
+  if (!user || !result) {
     // unAthorized
     next(new ApiError("Incorrect email or password", 401));
   }

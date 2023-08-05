@@ -90,6 +90,12 @@ exports.deleteUserValidator = asyncHandler(async (req, res, next) => {
 });
 
 exports.updateUserPasswordValidator = asyncHandler(async (req, res, next) => {
+  // validate userId
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    next(new ApiError("invalid Id", 400));
+  }
+
   const updateSchema = {
     password: baseUserSchema.password,
     confirmPassword: baseUserSchema.confirmPassword,
@@ -133,3 +139,23 @@ exports.updateLoggedUserValidator = asyncHandler(async (req, res, next) => {
 
   next();
 });
+
+exports.updateLoggedUserPasswordValidator = asyncHandler(
+  async (req, res, next) => {
+    const updateSchema = {
+      password: baseUserSchema.password,
+      confirmPassword: baseUserSchema.confirmPassword,
+    };
+
+    const schema = joi
+      .object(updateSchema)
+      .fork(Object.keys(updateSchema), (key) => key.required());
+
+    const { error } = validate(schema, req.body);
+    if (error) {
+      next(new ApiError(errorMsg(error), 400));
+    }
+
+    next();
+  }
+);

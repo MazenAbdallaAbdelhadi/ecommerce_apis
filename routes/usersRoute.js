@@ -19,6 +19,7 @@ const {
   updateUserValidator,
   updateLoggedUserValidator,
   updateUserPasswordValidator,
+  updateLoggedUserPasswordValidator,
 } = require("../utils/validators/userValidator");
 const { resizeImage } = require("../controllers/handlersFactory");
 const requireAuth = require("../middleware/requireAuth");
@@ -30,7 +31,7 @@ router.use(requireAuth);
 router.get("/getMe", getLoggedUserData, getUser);
 router.put(
   "/changeMyPassword",
-  updateUserPasswordValidator,
+  updateLoggedUserPasswordValidator,
   updateLoggedUserPassword
 );
 router.put(

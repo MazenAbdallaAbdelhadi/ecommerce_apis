@@ -79,7 +79,7 @@ exports.deleteUser = factory.deleteOne(Users);
 
 /**
  * @desc    user get his account
- * @route   api/v1/getMe
+ * @route   api/v1/users/getMe
  * @method  GET
  * @access  protected/user
  */
@@ -90,7 +90,7 @@ exports.getLoggedUserData = asyncHandler(async (req, res, next) => {
 
 /**
  * @desc    user update his account profile
- * @route   api/v1/updateMe
+ * @route   api/v1/users/updateMe
  * @method  PUT
  * @access  protected/user
  */
@@ -101,7 +101,7 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
 
 /**
  * @desc    user update his account password
- * @route   api/v1/updateMyPassword
+ * @route   api/v1/users/updateMyPassword
  * @method  PUT
  * @access  protected/user
  */
@@ -128,7 +128,7 @@ exports.updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
 
 /**
  * @desc    user diactivate his account
- * @route   api/v1/deleteMe
+ * @route   api/v1/users/deleteMe
  * @method  DELETE
  * @access  protected/user
  */

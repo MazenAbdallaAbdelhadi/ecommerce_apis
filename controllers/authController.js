@@ -1,5 +1,5 @@
+const crypto = require("crypto");
 const asyncHandler = require("express-async-handler");
-const bcrypt = require("bcrypt");
 const { v4: uuid } = require("uuid");
 
 const Users = require("../models/usersModel");
@@ -89,7 +89,7 @@ exports.logout = asyncHandler(async (req, res, next) => {
 function generateResetCode() {
   const min = 100000; // Minimum 6-digit number (inclusive)
   const max = 999999; // Maximum 6-digit number (inclusive)
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  return String(Math.floor(Math.random() * (max - min + 1)) + min);
 }
 /**
  * @desc    send code to user email to reset password
@@ -106,7 +106,10 @@ exports.forgetPassword = asyncHandler(async (req, res, next) => {
 
   // generate Reset Code
   const resetCode = generateResetCode();
-  const hashedResetCode = await bcrypt(resetCode, 5);
+  const hashedResetCode = crypto
+    .createHash("sha256")
+    .update(resetCode)
+    .digest("hex");
 
   // Save hashed password reset code into db
   user.passwordResetCode = hashedResetCode;
@@ -116,12 +119,7 @@ exports.forgetPassword = asyncHandler(async (req, res, next) => {
   await user.save();
 
   // send email
-  const message = `
-  Dear ${user.name},\n
-  We recently received a request to reset your password for your shoppy account. To proceed with the password reset, please use the following reset code:\n
-  Reset Code: ${resetCode}\n
-  Please note that this code is valid for 10 minutes only. If you did not initiate this request or believe it to be an error, you can safely ignore this email.
-  `;
+  const message = `Dear ${user.name},\n\nWe recently received a request to reset your password for your shoppy account. To proceed with the password reset, please use the following reset code:\n\nReset Code: ${resetCode}\n\nPlease note that this code is valid for 10 minutes only. If you did not initiate this request or believe it to be an error, you can safely ignore this email.`;
 
   try {
     await sendEmail({
@@ -151,7 +149,10 @@ exports.forgetPassword = asyncHandler(async (req, res, next) => {
  */
 exports.verifyResetCode = asyncHandler(async (req, res, next) => {
   // hash reset code in the body
-  const hashedResetCode = await bcrypt(req.body.resetCode, 5);
+  const hashedResetCode = crypto
+    .createHash("sha256")
+    .update(req.body.resetCode)
+    .digest("hex");
 
   // find the user with the hashed reset code
   const user = await Users.findOne({
@@ -170,7 +171,11 @@ exports.verifyResetCode = asyncHandler(async (req, res, next) => {
     maxAge: 10 * 60 * 1000,
   });
 
-  user.passwordResetSecret = await bcrypt(resetSecret, 5);
+  user.passwordResetSecret = crypto
+    .createHash("sha256")
+    .update(resetSecret)
+    .digest("hex");
+
   await user.save();
 
   res.status(200).json({
@@ -197,7 +202,12 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
     next(new ApiError("user not found", 400));
   }
 
-  if (!(await bcrypt.compare(resetSecret, user.passwordResetSecret))) {
+  const resetSecretHash = crypto
+    .createHash("sha256")
+    .update(resetSecret)
+    .digest("hex");
+
+  if (resetSecretHash !== user.passwordResetSecret) {
     next(new ApiError("invalid request", 401));
   }
 

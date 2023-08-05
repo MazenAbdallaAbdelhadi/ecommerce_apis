@@ -6,7 +6,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const corsOptions = require("./config/corsOptions");
 const dbConnect = require("./config/database");
-const { logger, logEvent } = require("./middleware/logger");
+// const { logger, logEvent } = require("./middleware/logger");
 const errorHandler = require("./middleware/errorHandler");
 const mountRoutes = require("./routes");
 const ApiError = require("./utils/ApiError");
@@ -22,7 +22,7 @@ app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(logger);
+// app.use(logger);
 
 app.use(express.static(path.join(__dirname, "uploads")));
 
@@ -50,10 +50,10 @@ mongoose.connection.once("open", () => {
 
 mongoose.connection.on("error", (err) => {
   console.log(err);
-  logEvent(
-    `${err.no}: ${err.code}\t${err.syscall}\t${err.hostname}`,
-    "mongoErrLog.log"
-  );
+  // logEvent(
+  //   `${err.no}: ${err.code}\t${err.syscall}\t${err.hostname}`,
+  //   "mongoErrLog.log"
+  // );
   process.exit(1);
 });
 

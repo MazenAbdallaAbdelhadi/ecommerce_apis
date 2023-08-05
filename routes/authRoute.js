@@ -12,13 +12,19 @@ const {
   verifyResetCode,
   resetPassword,
 } = require("../controllers/authController");
+const {
+  loginValidator,
+  registerValidator,
+  refreshValidator,
+  logoutValidator,
+} = require("../utils/validators/authValidator");
 
 const router = Router();
 
-router.post("/register", register);
-router.post("/login", login);
-router.get("/refresh", refresh);
-router.delete("/logout", logout);
+router.post("/register", registerValidator, register);
+router.post("/login", loginValidator, login);
+router.get("/refresh", refreshValidator, refresh);
+router.delete("/logout", logoutValidator, logout);
 router.post("/forgotPassword", forgetPassword);
 router.post("verifyResetCode", verifyResetCode);
 router.post("/resetPassword", resetPassword);

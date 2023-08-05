@@ -1,26 +1,28 @@
 const asyncHandler = require("express-async-handler");
-const Joi = require("joi");
+const joi = require("joi");
 const jwt = require("jsonwebtoken");
 const User = require("../../models/usersModel");
 const ApiError = require("../ApiError");
 
 const baseUserSchema = {
-  name: Joi.string().required(),
-  email: Joi.string().email().required(),
-  password: Joi.string().min(8).required(),
-  confirmPassword: Joi.string()
+  name: joi.string().required(),
+  email: joi.string().email().required(),
+  password: joi.string().min(8).required(),
+  confirmPassword: joi
+    .string()
     .required("confirm password is required")
-    .valid(Joi.ref("password")),
-  phone: Joi.string()
+    .valid(joi.ref("password")),
+  phone: joi
+    .string()
     .optional()
     .regex(/^[0-9]{10}$/),
 };
 
 exports.loginValidator = asyncHandler(async (req, res, next) => {
-  const userLoginSchema = Joi.object(
-    baseUserSchema.email,
-    baseUserSchema.password
-  );
+  const userLoginSchema = joi.object({
+    email: baseUserSchema.email,
+    password: baseUserSchema.password,
+  });
 
   const { error } = userLoginSchema.validate(req.body, {
     errors: { label: "key", wrap: { label: false } },
@@ -48,7 +50,7 @@ exports.loginValidator = asyncHandler(async (req, res, next) => {
 
 exports.registerValidator = asyncHandler(async (req, res, next) => {
   // Validate the request body
-  const { error, value } = baseUserSchema.validate(req.body, {
+  const { error, value } = joi.object(baseUserSchema).validate(req.body, {
     errors: { label: "key", wrap: { label: false } },
   });
 
